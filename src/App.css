@@ -252,3 +252,122 @@ body {
   text-transform: uppercase;
   letter-spacing: 1px;
 }
+
+/* Glassmorphism Core */
+.glass-card {
+  background: rgba(20, 20, 20, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  padding: 35px;
+  width: 100%;
+  max-width: 650px;
+  box-sizing: border-box;
+}
+
+/* Aurora Background Blobs */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.6;
+  z-index: -1;
+  transition: background 2s ease-in-out, transform 10s ease-in-out;
+  animation: float 20s infinite alternate;
+}
+
+.blob-1 {
+  top: -10%;
+  left: -10%;
+  width: 50vw;
+  height: 50vw;
+}
+
+.blob-2 {
+  bottom: -10%;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
+  animation-delay: -5s;
+}
+
+.blob-3 {
+  top: 40%;
+  left: 40%;
+  width: 40vw;
+  height: 40vw;
+  opacity: 0.4;
+  animation-duration: 25s;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate(50px, 50px) scale(1.1);
+  }
+}
+
+/* Focus Mode Adjustments */
+.focus-active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.focus-toggle-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 650px;
+  margin-bottom: 15px;
+}
+
+.focus-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.focus-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* UI Refinements */
+.bar-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  color: #e0e0e0;
+}
+
+.progress-bg {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.spotify-embed {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: height 0.5s ease;
+}
