@@ -10,8 +10,10 @@ function App() {
   const [history, setHistory] = useState([]);
   const [focusMode, setFocusMode] = useState(false);
 
+  // State to toggle between Spotify and YouTube playlists
+  const [activePlayer, setActivePlayer] = useState('youtube');
+
   useEffect(() => {
-    // BUG FIX: Try-catch prevents crashes if localStorage data is malformed
     try {
       const saved = JSON.parse(localStorage.getItem('vibe_history')) || [];
       setHistory(saved);
@@ -27,26 +29,67 @@ function App() {
     lowEnergy: ['calm', 'fatigue', 'passive', 'slow', 'tired', 'peaceful', 'quiet']
   };
 
+  // Expanded Data: Added 'youtubeId' and 'singles' array
   const vibeProfiles = {
     "Happy & Energetic": {
-      id: "37i9dQZF1EVJSvZp5AOML2", name: "Happy Hits", color1: "#FFD700", color2: "#FF8C00", val: 85, eng: 80,
-      singles: [{ title: "Levitating", artist: "Dua Lipa" }, { title: "Walking On Sunshine", artist: "Katrina & The Waves" }, { title: "Good Days", artist: "SZA" }]
+      id: "37i9dQZF1EVJSvZp5AOML2",
+      youtubeId: "PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU",
+      name: "Happy Hits", color1: "#FFD700", color2: "#FF8C00", val: 85, eng: 80,
+      singles: [
+        { title: "Levitating", artist: "Dua Lipa" },
+        { title: "Walking On Sunshine", artist: "Katrina & The Waves" },
+        { title: "Good Days", artist: "SZA" },
+        { title: "As It Was", artist: "Harry Styles" },
+        { title: "Blinding Lights", artist: "The Weeknd" }
+      ]
     },
     "Happy & Calm": {
-      id: "37i9dQZF1DWSf2RDTDayIx", name: "Happy Chill", color1: "#87CEFA", color2: "#98FB98", val: 75, eng: 30,
-      singles: [{ title: "Put Your Records On", artist: "Corinne Bailey Rae" }, { title: "Banana Pancakes", artist: "Jack Johnson" }, { title: "Sunday Morning", artist: "Maroon 5" }]
+      id: "37i9dQZF1DWSf2RDTDayIx",
+      youtubeId: "PLMIbmfPk1y4XZQsMEHk6Zq0Z2mP2I5Tq1",
+      name: "Happy Chill", color1: "#87CEFA", color2: "#98FB98", val: 75, eng: 30,
+      singles: [
+        { title: "Put Your Records On", artist: "Corinne Bailey Rae" },
+        { title: "Banana Pancakes", artist: "Jack Johnson" },
+        { title: "Sunday Morning", artist: "Maroon 5" },
+        { title: "Here Comes The Sun", artist: "The Beatles" },
+        { title: "Bubbly", artist: "Colbie Caillat" }
+      ]
     },
     "Sad & Melancholy": {
-      id: "37i9dQZF1DWVV27DiNWxkR", name: "Melancholia", color1: "#4682B4", color2: "#191970", val: 20, eng: 25,
-      singles: [{ title: "Sparks", artist: "Coldplay" }, { title: "Liability", artist: "Lorde" }, { title: "The Night We Met", artist: "Lord Huron" }]
+      id: "37i9dQZF1DWVV27DiNWxkR",
+      youtubeId: "PLxA687tYuMWi8OUus77n7ZiquRq0Wlbl2",
+      name: "Melancholia", color1: "#4682B4", color2: "#191970", val: 20, eng: 25,
+      singles: [
+        { title: "Sparks", artist: "Coldplay" },
+        { title: "Liability", artist: "Lorde" },
+        { title: "The Night We Met", artist: "Lord Huron" },
+        { title: "Skinny Love", artist: "Bon Iver" },
+        { title: "Someone Like You", artist: "Adele" }
+      ]
     },
     "Angry & Energetic": {
-      id: "37i9dQZF1DX1tyCD9QhIWF", name: "Rage Beats", color1: "#DC143C", color2: "#8B0000", val: 15, eng: 90,
-      singles: [{ title: "Misery Business", artist: "Paramore" }, { title: "Break Stuff", artist: "Limp Bizkit" }, { title: "good 4 u", artist: "Olivia Rodrigo" }]
+      id: "37i9dQZF1DX1tyCD9QhIWF",
+      youtubeId: "PLW0aKkE9mINJ00sJ25K_eQhD7T3IuE9G0",
+      name: "Rage Beats", color1: "#DC143C", color2: "#8B0000", val: 15, eng: 90,
+      singles: [
+        { title: "Misery Business", artist: "Paramore" },
+        { title: "Break Stuff", artist: "Limp Bizkit" },
+        { title: "good 4 u", artist: "Olivia Rodrigo" },
+        { title: "Killing In The Name", artist: "Rage Against The Machine" },
+        { title: "Smells Like Teen Spirit", artist: "Nirvana" }
+      ]
     },
     "Neutral & Focused": {
-      id: "37i9dQZF1DWZeKCadgRdKQ", name: "Deep Focus", color1: "#9370DB", color2: "#4B0082", val: 50, eng: 50,
-      singles: [{ title: "Clair de Lune", artist: "Claude Debussy" }, { title: "Weightless", artist: "Marconi Union" }, { title: "Cornfield Chase", artist: "Hans Zimmer" }]
+      id: "37i9dQZF1DWZeKCadgRdKQ",
+      youtubeId: "PLOzDu-MXXLliO9fBNZOQTBDddoA3FzZUo",
+      name: "Deep Focus", color1: "#9370DB", color2: "#4B0082", val: 50, eng: 50,
+      singles: [
+        { title: "Clair de Lune", artist: "Claude Debussy" },
+        { title: "Weightless", artist: "Marconi Union" },
+        { title: "Cornfield Chase", artist: "Hans Zimmer" },
+        { title: "Experience", artist: "Ludovico Einaudi" },
+        { title: "Gymnopédie No.1", artist: "Erik Satie" }
+      ]
     }
   };
 
@@ -111,6 +154,7 @@ function App() {
         },
         recommendation_data: {
           playlist_id: result.profile.id,
+          youtube_playlist_id: result.profile.youtubeId,
           playlist_name: result.profile.name,
           singles: result.profile.singles,
           quote: randomQuote
@@ -120,6 +164,7 @@ function App() {
       await addDoc(collection(db, "sessions"), finalSessionData);
 
       setSessionData(finalSessionData);
+      setActivePlayer('youtube'); // Set default player to YouTube
       const newHistory = [finalSessionData, ...history].slice(0, 5);
       setHistory(newHistory);
       localStorage.setItem('vibe_history', JSON.stringify(newHistory));
@@ -165,7 +210,6 @@ function App() {
             </form>
           ) : (
             <div className="result-container fade-in">
-              {/* Focus Mode Toggle */}
               <div className="focus-toggle-container">
                 <button onClick={() => setFocusMode(!focusMode)} className="focus-btn">
                   {focusMode ? "⤢ Exit Focus Mode" : "⤡ Enter Focus Mode"}
@@ -178,8 +222,7 @@ function App() {
                 </div>
 
                 <div className="quote-container">
-                  {/* BUG FIX: Safely rendering quotes using optional chaining */}
-                  <p className="quote-text">&quot;{sessionData.recommendation_data.quote?.text || "Creating harmony..."}&quot;</p>
+                  <p className="quote-text">"{sessionData.recommendation_data.quote?.text || "Creating harmony..."}"</p>
                   <p className="quote-author">— {sessionData.recommendation_data.quote?.author || "Expressify"}</p>
                 </div>
 
@@ -202,17 +245,74 @@ function App() {
                   </div>
                 )}
 
+                {/* UPGRADED FEATURE: Scrollable Individual Song Suggestions placed correctly here! */}
+                {!focusMode && (
+                  <div className="singles-container" style={{ textAlign: 'left', marginBottom: '25px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '8px' }}>
+                    <h4 style={{ color: '#b3b3b3', margin: '0 0 10px 0', borderBottom: '1px solid #333', paddingBottom: '8px' }}>Top Individual Track Suggestions</h4>
+
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, maxHeight: '180px', overflowY: 'auto' }} className="custom-scrollbar">
+                      {sessionData.recommendation_data.singles.map((track, idx) => {
+                        const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(track.title + ' ' + track.artist)}`;
+
+                        return (
+                          <li key={idx} style={{ padding: '10px 0', display: 'flex', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                            <span style={{ color: blob1Color, marginRight: '12px', fontSize: '1.2rem' }}>▸</span>
+                            <div style={{ flexGrow: 1 }}>
+                              <strong style={{ color: '#fff' }}>{track.title}</strong>
+                              <span style={{ color: '#b3b3b3', marginLeft: '8px', fontSize: '0.9rem' }}>by {track.artist}</span>
+                            </div>
+                            <a href={searchUrl} target="_blank" rel="noopener noreferrer"
+                              style={{ fontSize: '0.8rem', color: '#fff', background: '#ff0000', padding: '4px 10px', borderRadius: '12px', textDecoration: 'none' }}>
+                              Play
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+
+                {/* The Media Player Section */}
                 <div className="track-info">
-                  <iframe
-                    src={`https://open.spotify.com/embed/playlist/${sessionData.recommendation_data.playlist_id}?utm_source=generator&theme=0`}
-                    width="100%"
-                    height={focusMode ? "500" : "352"}
-                    frameBorder="0"
-                    allowFullScreen=""
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
-                    className="spotify-embed"
-                  ></iframe>
+                  <div className="platform-toggle" style={{ display: 'flex', gap: '10px', marginBottom: '15px', justifyContent: 'center' }}>
+                    <button
+                      style={{ padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', border: 'none', background: activePlayer === 'spotify' ? '#1db954' : '#333', color: 'white' }}
+                      onClick={() => setActivePlayer('spotify')}
+                    >
+                      Spotify
+                    </button>
+                    <button
+                      style={{ padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', border: 'none', background: activePlayer === 'youtube' ? '#ff0000' : '#333', color: 'white' }}
+                      onClick={() => setActivePlayer('youtube')}
+                    >
+                      YouTube
+                    </button>
+                  </div>
+
+                  {activePlayer === 'spotify' ? (
+                    <iframe
+                      src={`https://open.spotify.com/embed/playlist/${sessionData.recommendation_data.playlist_id}?utm_source=generator&theme=0`}
+                      width="100%"
+                      height={focusMode ? "500" : "352"}
+                      frameBorder="0"
+                      allowFullScreen=""
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                      className="media-embed fade-in"
+                    ></iframe>
+                  ) : (
+                    // YOUTUBE PLAYLIST EMBED URL
+                    <iframe
+                      src={`https://www.youtube.com/embed/videoseries?list=${sessionData.recommendation_data.youtube_playlist_id}`}
+                      width="100%"
+                      height={focusMode ? "500" : "352"}
+                      frameBorder="0"
+                      allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                      allowFullScreen
+                      className="media-embed fade-in"
+                      style={{ borderRadius: '12px' }}
+                    ></iframe>
+                  )}
                 </div>
               </div>
 

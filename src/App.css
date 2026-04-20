@@ -371,3 +371,51 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   transition: height 0.5s ease;
 }
+
+/* Platform Toggle Switch */
+.platform-toggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 30px;
+  padding: 4px;
+  margin-bottom: 15px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: #b3b3b3;
+  padding: 8px 24px;
+  border-radius: 26px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.toggle-btn:hover {
+  color: #fff;
+}
+
+.active-spotify {
+  background: #1db954;
+  color: white;
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
+}
+
+.active-youtube {
+  background: #ff0000;
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+}
+
+.media-embed {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: height 0.5s ease;
+  background: #121212;
+  /* Prevents white flash while YouTube loads */
+}
