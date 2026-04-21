@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize the YouTube API client
-youtube = build('youtube', 'v3', developerKey=os.getenv("AIzaSyCuegJkVJbDcImQZKIr3GYlv8hzQKU9TrI"))
+youtube = build('youtube', 'v3', developerKey=os.getenv("AIzaSyAx4jSrMGomR5a94dpov4xcWF-ehjKQjUE"))
 
 # Cache results to save your 10,000 daily quota!
 cache = TTLCache(maxsize=100, ttl=3600)

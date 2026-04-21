@@ -1,3 +1,8 @@
+/* src/App.css */
+
+/* =========================================
+   1. CORE VARIABLES & BASE
+   ========================================= */
 :root {
   --spotify-green: #1DB954;
   --bg-black: #080808;
@@ -15,9 +20,79 @@ body {
   color: var(--text-main);
   font-family: 'Circular Std', system-ui, sans-serif;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
-/* --- THE DANCING NOTES (RE-ACTIVATED) --- */
+/* =========================================
+   2. LAYOUT & ALIGNMENT
+   ========================================= */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#center {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+/* =========================================
+   3. BACKGROUND EFFECTS (Blobs & Notes)
+   ========================================= */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.6;
+  z-index: -1;
+  transition: background 2s ease-in-out, transform 10s ease-in-out;
+  animation: float 20s infinite alternate;
+}
+
+.blob-1 {
+  top: -10%;
+  left: -10%;
+  width: 50vw;
+  height: 50vw;
+}
+
+.blob-2 {
+  bottom: -10%;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
+  animation-delay: -5s;
+}
+
+.blob-3 {
+  top: 40%;
+  left: 40%;
+  width: 40vw;
+  height: 40vw;
+  opacity: 0.4;
+  animation-duration: 25s;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate(50px, 50px) scale(1.1);
+  }
+}
+
+/* The Dancing Notes (From Analyn Branch) */
 .music-wave-container {
   position: fixed;
   top: 0;
@@ -26,7 +101,6 @@ body {
   height: 100vh;
   pointer-events: none;
   z-index: 0;
-  /* Changed to 0 so they stay behind content but visible */
 }
 
 .music-note {
@@ -38,7 +112,6 @@ body {
   animation: landscapeFlow 18s linear infinite, landscapeWave 5s ease-in-out infinite alternate;
 }
 
-/* Individual Note Styling */
 .note-1 {
   top: 15%;
   animation-delay: 0s;
@@ -110,26 +183,9 @@ body {
   }
 }
 
-/* --- LAYOUT FIX (CENTERING) --- */
-#root {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-#center {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  /* Centers horizontally */
-  padding: 40px 20px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
+/* =========================================
+   4. TYPOGRAPHY & HERO (From Analyn Branch)
+   ========================================= */
 .hero {
   display: flex;
   flex-direction: column;
@@ -139,7 +195,8 @@ body {
   z-index: 10;
 }
 
-.hero h1 {
+.hero h1,
+.framework {
   font-size: 82px;
   font-weight: 900;
   letter-spacing: -3px;
@@ -152,7 +209,8 @@ body {
   filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.9));
 }
 
-.hero h2 {
+.hero p,
+.description {
   font-size: 18px;
   color: var(--spotify-green);
   text-transform: uppercase;
@@ -161,17 +219,29 @@ body {
   text-shadow: 0 0 15px rgba(29, 185, 84, 0.6);
 }
 
-/* --- THE DIARY FORM FIX --- */
+/* =========================================
+   5. UI COMPONENTS & FORMS
+   ========================================= */
+.glass-card {
+  background: rgba(20, 20, 20, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  padding: 35px;
+  width: 100%;
+  max-width: 650px;
+  box-sizing: border-box;
+}
+
 .diary-form {
   display: flex;
   flex-direction: column;
-  /* Force elements to stack vertically */
   align-items: center;
-  /* Center them horizontally */
   width: 100%;
   max-width: 600px;
   gap: 20px;
-  /* Space between label, textarea, and button */
   z-index: 10;
 }
 
@@ -186,7 +256,7 @@ body {
   transition: 0.3s;
   font-family: inherit;
   resize: none;
-  /* Prevents user from breaking the layout */
+  box-sizing: border-box;
 }
 
 .diary-input:focus {
@@ -195,7 +265,9 @@ body {
   background: rgba(40, 40, 40, 0.9);
 }
 
-.counter {
+.counter,
+.action-btn,
+.reset-btn {
   background-color: var(--spotify-green);
   color: black;
   border: none;
@@ -208,28 +280,41 @@ body {
   transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.counter:hover {
+.counter:hover,
+.action-btn:hover,
+.reset-btn:hover {
   transform: scale(1.05) translateY(-2px);
   background-color: #1ed760;
 }
 
-/* Footer Section */
-#next-steps {
-  display: flex;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 60px;
-  border-top: 1px solid var(--glass-border);
-  gap: 50px;
-  margin-top: auto;
-  z-index: 10;
+.counter:disabled,
+.action-btn:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  transform: none;
 }
 
-/* Literary Resonance Quote Styling */
+/* =========================================
+   6. WIDGETS & QUOTES
+   ========================================= */
+.mood-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
 .quote-container {
   margin: 20px 0;
   padding: 20px 30px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border-left: 4px solid var(--primary-color, #1db954);
+  border-left: 4px solid var(--spotify-green);
   border-radius: 0 8px 8px 0;
   text-align: left;
   font-style: italic;
@@ -253,97 +338,6 @@ body {
   letter-spacing: 1px;
 }
 
-/* Glassmorphism Core */
-.glass-card {
-  background: rgba(20, 20, 20, 0.45);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-  padding: 35px;
-  width: 100%;
-  max-width: 650px;
-  box-sizing: border-box;
-}
-
-/* Aurora Background Blobs */
-.blob {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.6;
-  z-index: -1;
-  transition: background 2s ease-in-out, transform 10s ease-in-out;
-  animation: float 20s infinite alternate;
-}
-
-.blob-1 {
-  top: -10%;
-  left: -10%;
-  width: 50vw;
-  height: 50vw;
-}
-
-.blob-2 {
-  bottom: -10%;
-  right: -10%;
-  width: 60vw;
-  height: 60vw;
-  animation-delay: -5s;
-}
-
-.blob-3 {
-  top: 40%;
-  left: 40%;
-  width: 40vw;
-  height: 40vw;
-  opacity: 0.4;
-  animation-duration: 25s;
-}
-
-@keyframes float {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-
-  100% {
-    transform: translate(50px, 50px) scale(1.1);
-  }
-}
-
-/* Focus Mode Adjustments */
-.focus-active {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.focus-toggle-container {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  max-width: 650px;
-  margin-bottom: 15px;
-}
-
-.focus-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
-}
-
-.focus-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* UI Refinements */
 .bar-row {
   display: flex;
   justify-content: space-between;
@@ -366,13 +360,9 @@ body {
   transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.spotify-embed {
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  transition: height 0.5s ease;
-}
-
-/* Platform Toggle Switch */
+/* =========================================
+   7. MEDIA PLAYERS & PLATFORM TOGGLES
+   ========================================= */
 .platform-toggle {
   display: flex;
   background: rgba(0, 0, 0, 0.4);
@@ -417,5 +407,74 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   transition: height 0.5s ease;
   background: #121212;
-  /* Prevents white flash while YouTube loads */
+}
+
+/* =========================================
+   8. FOCUS MODE
+   ========================================= */
+.focus-active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.focus-toggle-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 650px;
+  margin-bottom: 15px;
+}
+
+.focus-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.focus-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================
+   9. ANIMATIONS & UTILITIES (Added for React state)
+   ========================================= */
+.fade-in {
+  animation: fadeIn 0.8s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
