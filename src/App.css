@@ -756,3 +756,519 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4);
 }
+
+/* --- LAYOUT: CALENDAR BESIDE HEADER --- */
+.archive-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 35px;
+  /* Perfect spacing between calendar and title */
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.archive-title-container {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* --- FEATURE 1: HEATMAP WIDGET --- */
+.heatmap-wrapper {
+  background: var(--input-outer, rgba(255, 255, 255, 0.4));
+  padding: 15px;
+  border-radius: 16px;
+  border: 1px solid var(--sage-green, #89a37e);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.heatmap-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: var(--text-heading, #8b3a2b);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.heatmap-cell {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+/* --- RELEASE MODE: GENTLE DISSOLVE ANIMATION --- */
+.release-animation {
+  animation: floatAway 2s forwards ease-in-out;
+  pointer-events: none;
+  /* Prevents clicking while it fades */
+}
+
+@keyframes floatAway {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+
+  40% {
+    color: #89a37e;
+    /* Turns calming green */
+    filter: blur(2px);
+    transform: translateY(-15px) scale(0.98);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.95);
+    filter: blur(12px);
+  }
+}
+
+/* --- POST-RELEASE: BREATHING CIRCLE --- */
+.zen-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.breathing-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(137, 163, 126, 0.2) 0%, rgba(137, 163, 126, 0.6) 100%);
+  margin: 30px auto;
+  animation: breathe 8s infinite ease-in-out;
+  box-shadow: 0 0 20px rgba(137, 163, 126, 0.4);
+}
+
+@keyframes breathe {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scale(1.6);
+    opacity: 0.2;
+  }
+
+  /* Exhale/Expand */
+}
+
+/* --- ON THIS DAY --- */
+.on-this-day-card {
+  background: #fdfbf7;
+  border: 1px dashed var(--sage-green);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+/* --- UNIFORM STREAK --- */
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f4f0e6;
+  color: #8b3a2b;
+  border: 1px solid #89a37e;
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* --- EMOTION EXPLORER --- */
+.emotion-explorer {
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.explorer-title {
+  font-size: 1rem;
+  color: var(--text-sub);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.explorer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.explorer-card {
+  background: var(--input-outer, #f4f0e6);
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.explorer-card:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.explorer-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.explorer-emoji {
+  font-size: 1.2rem;
+}
+
+.explorer-mood-name {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.explorer-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.explorer-count {
+  font-size: 0.8rem;
+  color: #7a7a7a;
+  min-width: 60px;
+}
+
+.explorer-bar-bg {
+  flex-grow: 1;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.explorer-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* --- EMOTION METER (CIRCULAR CHARTS) --- */
+.top-metrics {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 20px 0 30px 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.circular-chart {
+  display: block;
+  margin: 0 auto;
+  max-width: 80px;
+  max-height: 80px;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.1);
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+
+.percentage {
+  fill: #8b3a2b;
+  font-family: sans-serif;
+  font-size: 0.5em;
+  text-anchor: middle;
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #7a7a7a;
+  letter-spacing: 1px;
+}
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+/* --- ARCHIVE HEADER --- */
+.archive-title-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.archive-title-container h2 {
+  margin: 0 0 8px 0;
+  color: #8b3a2b;
+  font-size: 2.5rem;
+  font-family: serif;
+}
+
+.archive-title-container p {
+  margin: 0;
+  color: #4a4a4a;
+  font-size: 1rem;
+}
+
+/* --- COMPACT HEATMAP WIDGET --- */
+.heatmap-wrapper {
+  background: var(--input-outer, rgba(255, 255, 255, 0.4));
+  padding: 15px;
+  border-radius: 16px;
+  border: 1px solid var(--sage-green, #89a37e);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  max-width: 220px;
+  margin: 0 auto 30px auto;
+}
+
+.heatmap-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: var(--text-heading, #8b3a2b);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  justify-content: center;
+}
+
+.heatmap-cell {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+/* --- FEATURE: EMOTION EXPLORER --- */
+.emotion-explorer {
+  margin-bottom: 35px;
+  text-align: left;
+}
+
+.explorer-title {
+  font-size: 0.85rem;
+  color: #7a7a7a;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+}
+
+.explorer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 15px;
+}
+
+.explorer-card {
+  background: #fdfbf7;
+  padding: 15px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.explorer-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
+}
+
+.explorer-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.explorer-emoji {
+  font-size: 1.2rem;
+}
+
+.explorer-mood-name {
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.explorer-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.explorer-count {
+  font-size: 0.85rem;
+  color: #7a7a7a;
+  min-width: 55px;
+}
+
+.explorer-bar-bg {
+  flex-grow: 1;
+  height: 6px;
+  background: #e0dcd3;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.explorer-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* --- RELEASE MODE ANIMATION --- */
+.release-animation {
+  animation: burnAway 1.5s forwards ease-in;
+}
+
+@keyframes burnAway {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+
+  50% {
+    color: #ff4500;
+    filter: blur(4px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-100px) scale(1.2);
+    filter: blur(20px);
+  }
+}
+
+.release-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+  color: #8b3a2b;
+  font-weight: bold;
+}
+
+/* --- EMOTION METER (CIRCULAR CHARTS) --- */
+.top-metrics {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 20px 0 30px 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.circular-chart {
+  display: block;
+  margin: 0 auto;
+  max-width: 80px;
+  max-height: 80px;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.1);
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+
+.percentage {
+  fill: #8b3a2b;
+  font-family: sans-serif;
+  font-size: 0.5em;
+  text-anchor: middle;
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #7a7a7a;
+  letter-spacing: 1px;
+}
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+/* --- UNIFORM STREAK --- */
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f4f0e6;
+  color: #8b3a2b;
+  border: 1px solid #89a37e;
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-top: 10px;
+}
