@@ -1,98 +1,4 @@
-/* src/App.css */
-
-/* =========================================
-   1. CORE VARIABLES & BASE
-   ========================================= */
-:root {
-  --spotify-green: #1DB954;
-  --bg-black: #080808;
-  --bg-card: rgba(25, 25, 25, 0.85);
-  --text-main: #FFFFFF;
-  --text-sub: #A7A7A7;
-  --glass-border: rgba(255, 255, 255, 0.1);
-}
-
-body {
-  margin: 0;
-  background-color: var(--bg-black);
-  background: radial-gradient(circle at 50% 50%, rgba(29, 185, 84, 0.08) 0%, transparent 70%),
-    var(--bg-black);
-  color: var(--text-main);
-  font-family: 'Circular Std', system-ui, sans-serif;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-/* =========================================
-   2. LAYOUT & ALIGNMENT
-   ========================================= */
-#root {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-#center {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 40px 20px;
-  width: 100%;
-  box-sizing: border-box;
-  z-index: 10;
-}
-
-/* =========================================
-   3. BACKGROUND EFFECTS (Blobs & Notes)
-   ========================================= */
-.blob {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.6;
-  z-index: -1;
-  transition: background 2s ease-in-out, transform 10s ease-in-out;
-  animation: float 20s infinite alternate;
-}
-
-.blob-1 {
-  top: -10%;
-  left: -10%;
-  width: 50vw;
-  height: 50vw;
-}
-
-.blob-2 {
-  bottom: -10%;
-  right: -10%;
-  width: 60vw;
-  height: 60vw;
-  animation-delay: -5s;
-}
-
-.blob-3 {
-  top: 40%;
-  left: 40%;
-  width: 40vw;
-  height: 40vw;
-  opacity: 0.4;
-  animation-duration: 25s;
-}
-
-@keyframes float {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-
-  100% {
-    transform: translate(50px, 50px) scale(1.1);
-  }
-}
-
-/* The Dancing Notes (From Analyn Branch) */
+/* --- THE DANCING NOTES (Darker & Brought Forward) --- */
 .music-wave-container {
   position: fixed;
   top: 0;
@@ -101,34 +7,36 @@ body {
   height: 100vh;
   pointer-events: none;
   z-index: 0;
+  /* Brought up slightly to sit nicely over the background image */
 }
 
 .music-note {
   position: absolute;
-  color: var(--spotify-green);
+  color: var(--dark-green);
+  /* Much darker color to pop against the cream background */
   opacity: 0;
-  font-size: 3rem;
-  text-shadow: 0 0 10px rgba(29, 185, 84, 0.8), 0 0 20px rgba(29, 185, 84, 0.4);
+  font-size: 3.5rem;
+  /* Made slightly larger for better visibility */
+  text-shadow: 0 4px 12px rgba(45, 59, 37, 0.2);
+  /* Soft shadow to give them depth */
   animation: landscapeFlow 18s linear infinite, landscapeWave 5s ease-in-out infinite alternate;
 }
 
 .note-1 {
   top: 15%;
   animation-delay: 0s;
-  color: #FFFFFF;
 }
 
 .note-2 {
   top: 35%;
   animation-delay: -3s;
-  font-size: 2.2rem;
+  font-size: 2.5rem;
 }
 
 .note-3 {
   top: 55%;
   animation-delay: -6s;
-  font-size: 3.5rem;
-  color: #FFFFFF;
+  font-size: 4rem;
 }
 
 .note-4 {
@@ -139,13 +47,13 @@ body {
 .note-5 {
   top: 75%;
   animation-delay: -12s;
-  font-size: 2.8rem;
+  font-size: 3.2rem;
 }
 
 .note-6 {
   top: 45%;
   animation-delay: -15s;
-  font-size: 2.2rem;
+  font-size: 2.5rem;
 }
 
 .note-7 {
@@ -160,13 +68,15 @@ body {
   }
 
   15% {
-    opacity: 0.3;
+    opacity: 0.6;
   }
 
+  /* Increased opacity so they pop */
   85% {
-    opacity: 0.3;
+    opacity: 0.6;
   }
 
+  /* Increased opacity so they pop */
   100% {
     left: -15%;
     opacity: 0;
@@ -183,270 +93,402 @@ body {
   }
 }
 
-/* =========================================
-   4. TYPOGRAPHY & HERO (From Analyn Branch)
-   ========================================= */
-.hero {
+/* --- (REMOVED WATERCOLOR CSS BLOBS TO PREVENT OVERLAP) --- */
+
+/* --- MAIN LAYOUT --- */
+.app-wrapper {
+  max-width: 800px;
+  margin: 60px auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 30px;
+  position: relative;
   z-index: 10;
 }
 
-.hero h1,
-.framework {
-  font-size: 82px;
-  font-weight: 900;
-  letter-spacing: -3px;
-  margin: 0;
-  line-height: 1.2;
-  color: #FFFFFF;
-  background: linear-gradient(to bottom, #ffffff 60%, #999 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.9));
+.main-card {
+  background-color: #fdfbf7;
+  padding: 60px 50px;
+  border-radius: 0;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+  position: relative;
 }
 
-.hero p,
-.description {
-  font-size: 18px;
-  color: var(--spotify-green);
+/* --- HERO SECTION --- */
+.ai-badge {
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fdfbf7;
+  border: 1px solid var(--spotify-rust);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--spotify-rust);
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  letter-spacing: 6px;
-  margin-top: 5px;
-  text-shadow: 0 0 15px rgba(29, 185, 84, 0.6);
 }
 
-/* =========================================
-   5. UI COMPONENTS & FORMS
-   ========================================= */
-.glass-card {
-  background: rgba(20, 20, 20, 0.45);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-  padding: 35px;
-  width: 100%;
-  max-width: 650px;
-  box-sizing: border-box;
-}
-
-.diary-form {
+.badge-icon {
+  background-color: var(--spotify-rust);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  width: 100%;
+  justify-content: center;
+}
+
+.hero {
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 4.5rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin: 20px 0 15px 0;
+  letter-spacing: -1px;
+}
+
+.hero .description {
+  font-size: 1.1rem;
+  color: var(--text-main);
   max-width: 600px;
-  gap: 20px;
-  z-index: 10;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- INPUT FORM --- */
+.input-card {
+  background: #f4f0e6;
+  border-radius: 16px;
+  padding: 15px;
+  width: 100%;
+  margin-top: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.diary-input-wrapper {
+  background: var(--sage-green);
+  border-radius: 12px;
+  padding: 30px;
 }
 
 .diary-input {
   width: 100%;
-  background: var(--bg-card);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  color: white;
-  font-size: 16px;
-  transition: 0.3s;
-  font-family: inherit;
-  resize: none;
-  box-sizing: border-box;
-}
-
-.diary-input:focus {
-  outline: none;
-  border-color: var(--spotify-green);
-  background: rgba(40, 40, 40, 0.9);
-}
-
-.counter,
-.action-btn,
-.reset-btn {
-  background-color: var(--spotify-green);
-  color: black;
   border: none;
-  border-radius: 50px;
-  padding: 16px 45px;
-  font-size: 14px;
-  font-weight: 800;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: transparent;
+  font-family: 'Caveat', cursive;
+  font-size: 1.8rem;
+  color: var(--dark-green);
+  resize: none;
+  outline: none;
+  min-height: 180px;
+  line-height: 1.4;
 }
 
-.counter:hover,
-.action-btn:hover,
-.reset-btn:hover {
-  transform: scale(1.05) translateY(-2px);
-  background-color: #1ed760;
+.diary-input::placeholder {
+  color: rgba(45, 59, 37, 0.6);
 }
 
-.counter:disabled,
-.action-btn:disabled {
-  background-color: #555;
-  cursor: not-allowed;
-  transform: none;
+.input-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding: 0 10px;
 }
 
-/* =========================================
-   6. WIDGETS & QUOTES
-   ========================================= */
-.mood-badge {
-  display: inline-block;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.char-count {
   font-size: 0.85rem;
-  margin-bottom: 15px;
-  color: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  color: var(--text-main);
 }
 
-.quote-container {
-  margin: 20px 0;
-  padding: 20px 30px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border-left: 4px solid var(--spotify-green);
-  border-radius: 0 8px 8px 0;
+.analyze-btn {
+  background: transparent;
+  color: var(--text-main);
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analyze-btn:hover:not(:disabled) {
+  color: var(--text-heading);
+}
+
+/* --- RESULTS LAYOUT --- */
+.results-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.8s ease-out forwards;
+  margin-top: 30px;
+}
+
+.mood-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.mood-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.mood-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  color: var(--text-heading);
+  margin: 0 0 5px 0;
+}
+
+.mood-header p {
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.top-metrics {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.circular-chart {
+  display: block;
+  width: 100px;
+  height: 100px;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #e5dfd3;
+  stroke-width: 3.5;
+}
+
+.circle {
+  fill: none;
+  stroke: var(--spotify-rust);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.percentage {
+  fill: var(--text-heading);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 9px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+/* --- QUOTES & KEYWORDS --- */
+.quote-box {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 25px 35px;
+  position: relative;
+  border-left: 6px solid var(--spotify-rust);
+  margin: 0 auto 30px auto;
+  width: 100%;
+  max-width: 600px;
   text-align: left;
-  font-style: italic;
 }
 
 .quote-text {
-  font-family: 'Georgia', serif;
-  font-size: 1.2rem;
-  line-height: 1.6;
-  color: #e0e0e0;
-  margin: 0 0 10px 0;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.4rem;
+  color: var(--text-heading);
+  margin: 0 0 15px 0;
+  line-height: 1.4;
 }
 
 .quote-author {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  font-weight: bold;
-  color: #888;
+  font-size: 0.95rem;
+  color: var(--dark-green);
   margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
-.bar-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  margin-bottom: 6px;
-  color: #e0e0e0;
-}
-
-.progress-bg {
+.keywords-section {
   width: 100%;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  height: 8px;
-  overflow: hidden;
+  max-width: 600px;
+  margin: 0 auto 40px auto;
+  text-align: left;
 }
 
-.progress-fill {
-  height: 100%;
-  border-radius: 6px;
-  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* =========================================
-   7. MEDIA PLAYERS & PLATFORM TOGGLES
-   ========================================= */
-.platform-toggle {
+.keyword-list {
   display: flex;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 30px;
-  padding: 4px;
-  margin-bottom: 15px;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.toggle-btn {
-  background: transparent;
-  border: none;
-  color: #b3b3b3;
-  padding: 8px 24px;
-  border-radius: 26px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
+.keyword-tag {
+  background: #e8eadb;
+  color: #2d3b25;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
-.toggle-btn:hover {
-  color: #fff;
+.keyword-tag .tag-label {
+  color: var(--sage-green);
+  margin-right: 6px;
 }
 
-.active-spotify {
-  background: #1db954;
-  color: white;
-  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
-}
-
-.active-youtube {
-  background: #ff0000;
-  color: white;
-  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
-}
-
-.media-embed {
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  transition: height 0.5s ease;
-  background: #121212;
-}
-
-/* =========================================
-   8. FOCUS MODE
-   ========================================= */
-.focus-active {
+/* --- PLATFORM TOGGLES --- */
+.platform-toggles {
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.focus-toggle-container {
-  display: flex;
-  justify-content: flex-end;
+  gap: 15px;
+  margin-bottom: 40px;
   width: 100%;
-  max-width: 650px;
-  margin-bottom: 15px;
 }
 
-.focus-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
+.toggle-pill {
+  border: none;
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0.5;
+}
+
+.toggle-pill.spotify {
+  background: var(--spotify-rust);
+}
+
+.toggle-pill.youtube {
+  background: var(--youtube-green);
+}
+
+.toggle-pill.active {
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* --- PLAYER AREA & PLAYLIST --- */
+.player-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.playlist-column {
+  width: 100%;
+  text-align: left;
+}
+
+.section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  letter-spacing: 1.5px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+.song-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.song-item {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.song-icon {
+  color: var(--spotify-rust);
+  display: flex;
+  align-items: center;
+}
+
+.song-info {
+  flex-grow: 1;
+}
+
+.song-title {
+  display: block;
+  font-weight: 700;
+  color: #2d2d2d;
+  font-size: 1rem;
+}
+
+.song-artist {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+.song-number {
+  font-size: 0.85rem;
+  color: #a8a8a8;
+  margin-left: auto;
+}
+
+.listen-btn {
+  font-size: 0.8rem;
   padding: 8px 16px;
   border-radius: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.listen-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.reset-btn {
+  background: transparent;
+  border: none;
+  color: var(--spotify-rust);
+  font-weight: 700;
+  text-decoration: underline;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
-}
-
-.focus-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* =========================================
-   9. ANIMATIONS & UTILITIES (Added for React state)
-   ========================================= */
-.fade-in {
-  animation: fadeIn 0.8s ease-in-out forwards;
+  font-size: 1rem;
+  margin-top: 40px;
 }
 
 @keyframes fadeIn {
@@ -459,22 +501,4 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
 }
