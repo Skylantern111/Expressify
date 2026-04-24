@@ -210,20 +210,82 @@
   color: var(--text-main);
 }
 
-.analyze-btn {
+/* --- INTERACTIVE BUTTONS --- */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.mic-btn {
   background: transparent;
-  color: var(--text-main);
-  border: none;
+  color: var(--sage-green);
+  border: 2px solid var(--sage-green);
+  padding: 10px 18px;
+  border-radius: 25px;
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.mic-btn:hover {
+  background: var(--sage-green);
+  color: white;
+}
+
+.mic-btn.listening {
+  background: #ff4747;
+  color: white;
+  border-color: #ff4747;
+  animation: pulseMic 1.5s infinite;
+}
+
+.analyze-btn {
+  background: var(--spotify-rust);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 25px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(139, 58, 43, 0.2);
 }
 
 .analyze-btn:hover:not(:disabled) {
-  color: var(--text-heading);
+  background: #a84634;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(139, 58, 43, 0.3);
+}
+
+.analyze-btn:disabled {
+  background: #cccccc;
+  color: #888;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+@keyframes pulseMic {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 71, 71, 0.5);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 71, 71, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 71, 71, 0);
+  }
 }
 
 /* --- RESULTS LAYOUT --- */
@@ -572,4 +634,125 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* --- DIARY ANALYTICS DASHBOARD --- */
+.history-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.stat-box {
+  background: var(--input-outer);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.stat-box.full-width {
+  grid-column: span 2;
+  border-left: 4px solid var(--spotify-rust);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-family: 'Playfair Display', serif;
+  color: var(--text-heading);
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.stat-box.full-width .stat-value {
+  font-size: 1.6rem;
+  color: var(--dark-green);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+
+/* --- SAVED FAVORITES FEATURE --- */
+.fav-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fav-btn:hover {
+  transform: scale(1.2);
+}
+
+.fav-btn.active {
+  color: #ff4747;
+  text-shadow: 0 0 10px rgba(255, 71, 71, 0.4);
+}
+
+.nav-group {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* --- HEATMAP --- */
+.heatmap-wrapper {
+  margin: 0;
+  background: var(--input-outer, #f4f0e6);
+  padding: 12px;
+  border-radius: 15px;
+  border: 1px solid var(--sage-green, #89a37e);
+  max-width: 220px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.heatmap-cell {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+/* --- POLAROID EXPORT --- */
+.polaroid-capture-area {
+  padding: 20px;
+  border-radius: 16px;
+  background: transparent;
+}
+
+.export-btn {
+  background: linear-gradient(135deg, #1DB954, #1aa34a);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 15px auto 25px auto;
+  transition: all 0.3s;
+}
+
+.export-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4);
 }
