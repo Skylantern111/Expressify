@@ -2,7 +2,8 @@
 
 :root {
   --bg-cream: #fdfbf7;
-  --card-bg: #f2ece0;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  /* Slightly transparent white for glass effect */
   --text-main: #4a4a4a;
   --text-heading: #8b3a2b;
   /* Rust */
@@ -10,7 +11,9 @@
   --dark-green: #2d3b25;
   --spotify-rust: #8b3a2b;
   --youtube-green: #89a37e;
-
+  --spotify-green: #1DB954;
+  --text-sub: #7a7a7a;
+  --glass-border: rgba(0, 0, 0, 0.1);
 }
 
 body {
@@ -18,8 +21,12 @@ body {
   padding: 0;
   background: url('./assets/background.png') no-repeat center center fixed;
   background-size: cover;
-  /* This ensures the image stretches to fit perfectly */
+  background-color: var(--bg-cream);
+  /* Fallback */
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, sans-serif;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 * {
@@ -31,4 +38,5 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
 }

@@ -8,7 +8,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [sessionData, setSessionData] = useState(null);
   const [history, setHistory] = useState([]);
-  const [activePlayer, setActivePlayer] = useState('spotify');
+  const [showHistory, setShowHistory] = useState(false);
+  const [activePlayer, setActivePlayer] = useState('youtube');
 
   useEffect(() => {
     try {
@@ -108,7 +109,7 @@ function App() {
 
       const finalSessionData = {
         session_id: "sess_" + Date.now(),
-        timestamp: new Date().toLocaleTimeString(),
+        timestamp: new Date().toLocaleString(),
         original_text: diaryEntry,
         token_count: tokenCount,
         extracted_keywords: extractKeywords(diaryEntry),
@@ -128,7 +129,8 @@ function App() {
       try { await addDoc(collection(db, "sessions"), finalSessionData); } catch (fbError) { console.warn("FB Error:", fbError); }
 
       setSessionData(finalSessionData);
-      setActivePlayer('spotify');
+      setActivePlayer('youtube');
+      setShowHistory(false);
       const newHistory = [finalSessionData, ...history].slice(0, 10);
       setHistory(newHistory);
       localStorage.setItem('vibe_history', JSON.stringify(newHistory));
@@ -137,11 +139,6 @@ function App() {
 
   return (
     <div id="root">
-      {/* Background Watercolor Blobs */}
-      <div className="watercolor-blob blob-1"></div>
-      <div className="watercolor-blob blob-2"></div>
-      <div className="watercolor-blob blob-3"></div>
-      <div className="splatter-1"></div>
 
       <div className="music-wave-container">
         <div className="music-note note-1">♪</div><div className="music-note note-2">♫</div><div className="music-note note-3">♩</div><div className="music-note note-4">♬</div><div className="music-note note-5">♪</div><div className="music-note note-6">♫</div><div className="music-note note-7">♭</div>
@@ -152,7 +149,7 @@ function App() {
 
           <div className="ai-badge">
             <div className="badge-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
                 <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
               </svg>
@@ -161,19 +158,67 @@ function App() {
           </div>
 
           <div className="hero">
-            <h1>Expressify</h1>
-            <p className="description">Transform your words into emotional insights. Discover your mood, get curated playlists, and find quotes that resonate.</p>
+            <div>
+              <h1>Expressify</h1>
+              <p className="description">Transform your words into emotional insights.</p>
+            </div>
+
+            {/* The Diary Navigation Button */}
+            {!sessionData && (
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className="history-toggle-btn"
+              >
+                {showHistory ? "Back to Generator" : "📖 My Diary Archive"}
+              </button>
+            )}
           </div>
 
-          {!sessionData ? (
+          {showHistory ? (
+            /* --- DIARY ARCHIVE VIEW --- */
+            <div className="history-container">
+              <div className="mood-header">
+                <h2>My Diary Archive</h2>
+                <p>Your past entries and emotional insights.</p>
+              </div>
+              {history.length === 0 ? (
+                <div className="history-card" style={{ textAlign: 'center', color: 'var(--text-sub)' }}>
+                  No diary entries found. Start reflecting!
+                </div>
+              ) : (
+                <div className="history-list">
+                  {history.map((entry, idx) => (
+                    <div key={idx} className="history-card">
+                      <div className="history-header">
+                        <span className="history-date">{entry.timestamp}</span>
+                        <span className="history-mood">{entry.affective_computing_data.detected_mood}</span>
+                      </div>
+                      <p className="history-text">"{entry.original_text || "No text recorded"}"</p>
+                      {entry.recommendation_data.singles && entry.recommendation_data.singles.length > 0 && (
+                        <div className="history-song">
+                          🎵 <strong>Soundtrack:</strong> {entry.recommendation_data.singles[0].title} by {entry.recommendation_data.singles[0].artist}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : !sessionData ? (
+            /* --- INPUT FORM --- */
             <form onSubmit={handleAnalyze} className="input-card">
               <div className="diary-input-wrapper">
-                <textarea value={diaryEntry} onChange={(e) => setDiaryEntry(e.target.value)} placeholder="The rain has been pouring all day, and the sky looks so grey..." className="diary-input" />
+                <textarea
+                  value={diaryEntry}
+                  onChange={(e) => setDiaryEntry(e.target.value)}
+                  placeholder="The rain has been pouring all day, and the sky looks so grey..."
+                  className="diary-input"
+                />
               </div>
               <div className="input-footer">
                 <span className="char-count">{diaryEntry.length} / 1000</span>
                 <button type="submit" className="analyze-btn" disabled={loading || !diaryEntry.trim()}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                   </svg>
                   {loading ? 'Analyzing...' : 'Analyze'}
@@ -181,6 +226,7 @@ function App() {
               </div>
             </form>
           ) : (
+            /* --- RESULTS DASHBOARD --- */
             <div className="results-container">
 
               <div className="mood-header">
@@ -208,7 +254,6 @@ function App() {
                 </div>
               </div>
 
-              {/* QUOTE AND KEYWORDS NOW STACKED ABOVE TOGGLES */}
               <div className="quote-box">
                 <p className="quote-text">"{sessionData.recommendation_data.quote?.text}"</p>
                 <p className="quote-author">— {sessionData.recommendation_data.quote?.author}</p>
@@ -240,7 +285,7 @@ function App() {
                 {activePlayer === 'spotify' ? (
                   <iframe
                     key={sessionData.recommendation_data.playlist_id}
-                    src={`https://open.spotify.com/embed/playlist/${sessionData.recommendation_data.playlist_id}?utm_source=generator&theme=0`}
+                    src={`https://open.spotify.com/embed/playlist/${sessionData.recommendation_data.playlist_id}?utm_source=generator`}
                     width="100%"
                     height="352"
                     frameBorder="0"
@@ -257,7 +302,7 @@ function App() {
                         const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(track.title + ' ' + track.artist)}`;
                         return (
                           <div className="song-item" key={idx}>
-                            <div className="song-icon youtube-icon">
+                            <div className="song-icon">
                               <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                                 <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
                               </svg>
@@ -266,7 +311,7 @@ function App() {
                               <span className="song-title">{track.title}</span>
                               <span className="song-artist">{track.artist}</span>
                             </div>
-                            <a href={youtubeSearchUrl} target="_blank" rel="noopener noreferrer" className="listen-btn youtube-btn">
+                            <a href={youtubeSearchUrl} target="_blank" rel="noopener noreferrer" className="listen-btn">
                               Listen on YouTube
                             </a>
                           </div>
