@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { db } from './firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import html2canvas from 'html2canvas';
 import './App.css';
 
@@ -53,16 +53,24 @@ function App() {
   const [diaryEntry, setDiaryEntry] = useState('');
   const [loading, setLoading] = useState(false);
   const [sessionData, setSessionData] = useState(null);
+
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
+
   const [activePlayer, setActivePlayer] = useState('youtube');
   const [isListening, setIsListening] = useState(false);
   const [filterMood, setFilterMood] = useState(null);
+
+  // Melody Release Feature States
   const [isReleaseMode, setIsReleaseMode] = useState(false);
-  const [isBurning, setIsBurning] = useState(false);
-  const [releasedState, setReleasedState] = useState(false);
+  const [isReleasingNote, setIsReleasingNote] = useState(false);
+
+  // Global Stave Feature States
+  const [showStave, setShowStave] = useState(false);
+  const [globalNotes, setGlobalNotes] = useState([]);
+  const [selectedNote, setSelectedNote] = useState(null);
 
   const polaroidRef = useRef(null);
 
@@ -130,14 +138,13 @@ function App() {
 
   const analyzeTextEmotion = (text) => {
     const tokens = text.toLowerCase().replace(/[.,!?;]/g, '').split(/\s+/);
-    const negators = ['not', 'never', 'dont', "don't", 'cant', "can't", 'hardly', 'barely', 'no', 'isnt', "isn't", 'wasnt', "wasn't", 'arent', "aren't", 'didnt', "didn't"];
-
     let isHappy = false, isSad = false, isHighEnergy = false, isLowEnergy = false;
     let isConfident = false, isRomantic = false, isAnxious = false, isNostalgic = false, isTired = false;
 
     tokens.forEach((t, i) => {
       const prev1 = i > 0 ? tokens[i - 1] : '';
       const prev2 = i > 1 ? tokens[i - 2] : '';
+      const negators = ['not', 'never', 'dont', "don't", 'cant', "can't"];
       const isNegated = negators.includes(prev1) || negators.includes(prev2);
 
       if (emotionDictionary.highValence.includes(t)) { isNegated ? isSad = true : isHappy = true; }
@@ -170,11 +177,28 @@ function App() {
     if (!diaryEntry.trim()) return;
 
     if (isReleaseMode) {
-      setIsBurning(true);
-      setTimeout(() => {
-        setIsBurning(false);
-        setReleasedState(true);
-      }, 2000);
+      setIsReleasingNote(true);
+
+      const result = analyzeTextEmotion(diaryEntry);
+
+      // Wait for the full note floating animation to finish (3s) before wiping state
+      setTimeout(async () => {
+        try {
+          await addDoc(collection(db, "global_symphony"), {
+            text: diaryEntry,
+            mood: result.mood,
+            color: result.profile.color1,
+            timestamp: Date.now(),
+            resonanceCount: 0
+          });
+        } catch (err) {
+          console.warn("Could not save to global symphony, continuing offline.", err);
+        }
+
+        setIsReleasingNote(false);
+        setDiaryEntry('');
+        setIsReleaseMode(false);
+      }, 3000);
     } else {
       performAnalysis(true);
     }
@@ -234,6 +258,27 @@ function App() {
     }
   };
 
+  const fetchGlobalNotes = async () => {
+    try {
+      const q = query(collection(db, "global_symphony"), orderBy("timestamp", "desc"), limit(10));
+      const querySnapshot = await getDocs(q);
+      const notes = [];
+      querySnapshot.forEach((doc) => {
+        notes.push({
+          id: doc.id,
+          ...doc.data(),
+          top: Math.floor(Math.random() * 60) + 20 + '%',
+          left: Math.floor(Math.random() * 80) + 10 + '%',
+          animationDelay: (Math.random() * 2) + 's'
+        });
+      });
+      setGlobalNotes(notes);
+    } catch (err) {
+      console.warn("Could not fetch global notes. Ensure Firebase is configured.", err);
+    }
+  };
+
+  // --- LOGIC BLOCK: STATS AND HEATMAP ---
   const totalEntries = history.length;
   let avgValence = 0;
   let avgEnergy = 0;
@@ -255,14 +300,10 @@ function App() {
 
   let currentStreak = 0;
   if (history.length > 0) {
-    const uniqueDates = [...new Set(history.map(entry => {
-      return new Date(entry.timestamp.split(',')[0]).toDateString();
-    }))].filter(d => d !== "Invalid Date").sort((a, b) => new Date(b) - new Date(a));
-
+    const uniqueDates = [...new Set(history.map(entry => new Date(entry.timestamp.split(',')[0]).toDateString()))].filter(d => d !== "Invalid Date").sort((a, b) => new Date(b) - new Date(a));
     if (uniqueDates.length > 0) {
       const todayStr = new Date().toDateString();
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
       const yesterdayStr = yesterday.toDateString();
 
       if (uniqueDates[0] === todayStr || uniqueDates[0] === yesterdayStr) {
@@ -271,9 +312,7 @@ function App() {
           if (uniqueDates[i] === checkDate.toDateString()) {
             currentStreak++;
             checkDate.setDate(checkDate.getDate() - 1);
-          } else {
-            break;
-          }
+          } else { break; }
         }
       }
     }
@@ -285,8 +324,8 @@ function App() {
     const d = new Date();
     d.setDate(today.getDate() - i);
     const dateStr = d.toLocaleDateString();
-
     const dayEntries = history.filter(entry => entry.timestamp.split(',')[0] === dateStr);
+
     let dominantMood = null;
     let color = 'transparent';
 
@@ -320,41 +359,99 @@ function App() {
       <div className="app-wrapper">
         <div className="main-card">
 
-          <div className="ai-badge" style={{ cursor: (showHistory || showFavorites || sessionData) ? 'pointer' : 'default' }} onClick={() => { setShowHistory(false); setShowFavorites(false); setSessionData(null); setFilterMood(null); }}>
+          <div className="ai-badge" style={{ cursor: (showHistory || showFavorites || showStave || sessionData) ? 'pointer' : 'default' }} onClick={() => { setShowHistory(false); setShowFavorites(false); setShowStave(false); setSessionData(null); setFilterMood(null); }}>
             <div className="badge-icon">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
                 <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
               </svg>
             </div>
-            {(showHistory || showFavorites || sessionData) ? "← Back to Generator" : "Affective Computing"}
+            {(showHistory || showFavorites || showStave || sessionData) ? "← Back to Generator" : "Affective Computing"}
           </div>
 
           <div className="hero">
             <div>
-              <h1 style={{ cursor: 'pointer' }} onClick={() => { setShowHistory(false); setShowFavorites(false); setSessionData(null); setFilterMood(null); }}>Expressify</h1>
+              <h1 style={{ cursor: 'pointer' }} onClick={() => { setShowHistory(false); setShowFavorites(false); setShowStave(false); setSessionData(null); setFilterMood(null); }}>Expressify</h1>
               <p className="description">Transform your words into emotional insights.</p>
 
-              {currentStreak > 0 && !sessionData && !showHistory && !showFavorites && (
+              {currentStreak > 0 && !sessionData && !showHistory && !showFavorites && !showStave && (
                 <div className="streak-badge">
                   <span style={{ fontSize: '1.2rem' }}>🌱</span> {currentStreak} Day Reflection Streak
                 </div>
               )}
             </div>
 
-            {!sessionData && !showHistory && !showFavorites && (
+            {!sessionData && !showHistory && !showFavorites && !showStave && (
               <div className="nav-group">
-                <button onClick={() => { setShowHistory(true); setShowFavorites(false); setFilterMood(null); }} className="history-toggle-btn">
+                <button onClick={() => { setShowHistory(true); setShowFavorites(false); setShowStave(false); setFilterMood(null); }} className="history-toggle-btn">
                   📖 My Archive
                 </button>
-                <button onClick={() => { setShowFavorites(true); setShowHistory(false); setFilterMood(null); }} className="history-toggle-btn">
+                <button onClick={() => { setShowFavorites(true); setShowHistory(false); setShowStave(false); setFilterMood(null); }} className="history-toggle-btn">
                   ❤️ Favorites
+                </button>
+                <button onClick={() => { setShowStave(true); setShowHistory(false); setShowFavorites(false); fetchGlobalNotes(); }} className="history-toggle-btn" style={{ background: '#89a37e', color: 'white', borderColor: '#89a37e' }}>
+                  🎼 The Global Stave
                 </button>
               </div>
             )}
           </div>
 
-          {showFavorites ? (
+          {showStave ? (
+            <div className="stave-container fade-in" style={{ position: 'relative', minHeight: '450px', background: '#fdfbf7', borderRadius: '16px', border: '1px solid #d1c8b8', padding: '20px', overflow: 'hidden' }}>
+              <div style={{ textAlign: 'center', marginBottom: '30px', position: 'relative', zIndex: 10 }}>
+                <h2 style={{ color: '#8b3a2b', margin: '0 0 5px 0', fontSize: '2.2rem' }}>The Global Stave</h2>
+                <p style={{ color: '#7a7a7a', fontSize: '0.9rem', margin: 0 }}>Click a note to hear an anonymous thought.</p>
+              </div>
+
+              <div style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '35px', opacity: 0.15, pointerEvents: 'none' }}>
+                <hr style={{ borderTop: '2px solid #000', width: '100%' }} />
+                <hr style={{ borderTop: '2px solid #000', width: '100%' }} />
+                <hr style={{ borderTop: '2px solid #000', width: '100%' }} />
+                <hr style={{ borderTop: '2px solid #000', width: '100%' }} />
+                <hr style={{ borderTop: '2px solid #000', width: '100%' }} />
+              </div>
+
+              {globalNotes.length === 0 && (
+                <div style={{ textAlign: 'center', marginTop: '100px', color: '#7a7a7a' }}>No notes drifting right now. Be the first to cast one!</div>
+              )}
+
+              {globalNotes.map((note) => (
+                <div
+                  key={note.id}
+                  onClick={() => setSelectedNote(note)}
+                  style={{
+                    position: 'absolute',
+                    top: note.top,
+                    left: note.left,
+                    fontSize: '2.5rem',
+                    cursor: 'pointer',
+                    color: note.color || '#89a37e',
+                    textShadow: '0 4px 8px rgba(0,0,0,0.15)',
+                    animation: `floatUpDown 3s ease-in-out infinite alternate`,
+                    animationDelay: note.animationDelay,
+                    transition: 'transform 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.3)'}
+                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                >
+                  {['🎵', '🎶', '♩'][Math.floor(Math.random() * 3)]}
+                </div>
+              ))}
+
+              {selectedNote && (
+                <div className="glass-card fade-in" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '85%', zIndex: 100, textAlign: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.15)' }}>
+                  <span style={{ fontSize: '2rem' }}>{moodEmojis[selectedNote.mood]}</span>
+                  <p style={{ fontStyle: 'italic', fontSize: '1.2rem', margin: '15px 0' }}>"{selectedNote.text}"</p>
+                  <small style={{ color: selectedNote.color, fontWeight: 'bold' }}>{selectedNote.mood}</small>
+
+                  <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                    <button onClick={() => setSelectedNote(null)} className="history-toggle-btn" style={{ background: '#2d2d2d', color: 'white' }}>🤍 Resonate</button>
+                    <button onClick={() => setSelectedNote(null)} className="history-toggle-btn">Close</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : showFavorites ? (
             <div className="history-container fade-in">
               <div className="archive-title-container">
                 <h2>My Saved Tracks</h2>
@@ -399,7 +496,8 @@ function App() {
                           width: '12px', height: '12px', borderRadius: '3px',
                           background: day.color,
                           opacity: day.isMuted ? 0.2 : 1,
-                          border: day.color === 'transparent' ? '1px solid #e0dcd3' : 'none'
+                          border: day.color === 'transparent' ? '1px solid #e0dcd3' : 'none',
+                          cursor: 'pointer'
                         }}
                         title={`${day.date}: ${day.count > 0 ? day.mood : "No entries"}`}
                       ></div>
@@ -495,68 +593,53 @@ function App() {
               )}
             </div>
           ) : !sessionData ? (
-            <form onSubmit={handleAnalyze} className={`input-card fade-in ${isBurning ? 'release-animation' : ''}`}>
-              <div className="release-toggle">
-                <input type="checkbox" id="rel" checked={isReleaseMode} onChange={() => setIsReleaseMode(!isReleaseMode)} />
-                <label htmlFor="rel">Release Mode </label>
-              </div>
-              <div className="diary-input-wrapper">
-                <textarea
-                  value={diaryEntry}
-                  onChange={(e) => setDiaryEntry(e.target.value)}
-                  placeholder={isReleaseMode ? "Vent here... this will burn away." : "Share your thoughts..."}
-                  className="diary-input"
-                />
-              </div>
-              <div className="input-footer">
-                <span className="char-count">{diaryEntry.length} / 1000</span>
-                <div className="action-buttons">
-                  <button
-                    type="button"
-                    className={`mic-btn ${isListening ? 'listening' : ''}`}
-                    onClick={handleSpeechToText}
-                    title="Click to dictate"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                      <line x1="12" y1="19" x2="12" y2="23"></line>
-                      <line x1="8" y1="23" x2="16" y2="23"></line>
-                    </svg>
-                    {isListening ? 'Listening...' : 'Voice'}
-                  </button>
 
-                  <button type="submit" className="analyze-btn" disabled={loading || !diaryEntry.trim()}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="11" cy="11" r="8"></circle>
-                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    {loading ? 'Scanning...' : 'Analyze'}
-                  </button>
+            <div className="input-card-wrapper fade-in">
+              <form onSubmit={handleAnalyze} className={`input-card ${isReleasingNote ? 'note-release-animation' : ''}`}>
+                <div className="release-toggle">
+                  <input type="checkbox" id="rel" checked={isReleaseMode} onChange={() => setIsReleaseMode(!isReleaseMode)} />
+                  <label htmlFor="rel">🎼 Release into the Melody (Analyze but don't save)</label>
                 </div>
-              </div>
-            </form>
-          ) : releasedState ? (
-            <div className="glass-card fade-in zen-container">
-              <h2 style={{ color: '#89a37e', fontSize: '2rem', marginBottom: '10px' }}>Let it go.</h2>
-              <p style={{ color: '#4a4a4a', fontSize: '1.1rem', maxWidth: '400px', margin: '0 auto' }}>
-                Your thoughts have been released into the ether. They are no longer weighing you down. Take a deep breath.
-              </p>
+                <div className="diary-input-wrapper">
+                  <textarea
+                    value={diaryEntry}
+                    onChange={(e) => setDiaryEntry(e.target.value)}
+                    placeholder={isReleaseMode ? "Write it out. Then let it drift into the global symphony..." : "Share your thoughts..."}
+                    className="diary-input"
+                  />
+                </div>
+                <div className="input-footer">
+                  <span className="char-count">{diaryEntry.length} / 1000</span>
+                  <div className="action-buttons">
+                    <button
+                      type="button"
+                      className={`mic-btn ${isListening ? 'listening' : ''}`}
+                      onClick={handleSpeechToText}
+                      title="Click to dictate"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                      </svg>
+                      {isListening ? 'Listening...' : 'Voice'}
+                    </button>
 
-              <div className="breathing-circle"></div>
+                    <button type="submit" className="analyze-btn" disabled={loading || !diaryEntry.trim()}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                      {loading ? 'Scanning...' : (isReleaseMode ? 'Cast Note' : 'Analyze')}
+                    </button>
+                  </div>
+                </div>
+              </form>
 
-              <button
-                onClick={() => {
-                  setReleasedState(false);
-                  setDiaryEntry('');
-                  setIsReleaseMode(false);
-                  setSessionData(null);
-                }}
-                className="history-toggle-btn"
-                style={{ marginTop: '20px' }}
-              >
-                Return Home
-              </button>
+              {isReleasingNote && (
+                <div className="floating-musical-note">🎵</div>
+              )}
             </div>
 
           ) : (
@@ -612,8 +695,8 @@ function App() {
               </div>
 
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <button onClick={handleSavePolaroid} className="export-btn" style={{ background: '#55df85', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>
-                  Save as Polaroid
+                <button onClick={handleSavePolaroid} className="export-btn" style={{ background: '#1db954', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  📸 Save as Polaroid
                 </button>
               </div>
 
