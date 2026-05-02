@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { db } from './firebase';
-import { collection, addDoc, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, addDoc, query, orderBy, limit, getDocs, doc, updateDoc, increment, where } from 'firebase/firestore';
 import html2canvas from 'html2canvas';
 import './App.css';
 
@@ -72,6 +72,11 @@ function App() {
   const [globalNotes, setGlobalNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
 
+  // Echo Feature States
+  const [localUserId, setLocalUserId] = useState('');
+  const [myResonances, setMyResonances] = useState(0);
+  const [hasResonated, setHasResonated] = useState(false);
+
   const polaroidRef = useRef(null);
 
   useEffect(() => {
@@ -80,6 +85,29 @@ function App() {
       setHistory(savedH);
       const savedF = JSON.parse(localStorage.getItem('vibe_favorites')) || [];
       setFavorites(savedF);
+
+      // --- 1. SET UP SECRET ANONYMOUS TAG ---
+      let uid = localStorage.getItem('expressify_uid');
+      if (!uid) {
+        uid = 'user_' + Date.now() + Math.floor(Math.random() * 10000);
+        localStorage.setItem('expressify_uid', uid);
+      }
+      setLocalUserId(uid);
+
+      // --- 2. CHECK FOR RESONANCES (THE ECHO) ---
+      const checkEchoes = async () => {
+        try {
+          const q = query(collection(db, "global_symphony"), where("authorId", "==", uid));
+          const querySnapshot = await getDocs(q);
+          let total = 0;
+          querySnapshot.forEach((doc) => {
+            total += (doc.data().resonanceCount || 0);
+          });
+          setMyResonances(total);
+        } catch (e) { console.warn("Could not fetch echoes", e) }
+      };
+
+      checkEchoes();
     } catch (e) { setHistory([]); setFavorites([]); }
   }, []);
 
@@ -178,7 +206,6 @@ function App() {
 
     if (isReleaseMode) {
       setIsReleasingNote(true);
-
       const result = analyzeTextEmotion(diaryEntry);
 
       // Wait for the full note floating animation to finish (3s) before wiping state
@@ -189,7 +216,8 @@ function App() {
             mood: result.mood,
             color: result.profile.color1,
             timestamp: Date.now(),
-            resonanceCount: 0
+            resonanceCount: 0,
+            authorId: localUserId // Tagged for the echo!
           });
         } catch (err) {
           console.warn("Could not save to global symphony, continuing offline.", err);
@@ -275,6 +303,22 @@ function App() {
       setGlobalNotes(notes);
     } catch (err) {
       console.warn("Could not fetch global notes. Ensure Firebase is configured.", err);
+    }
+  };
+
+  const handleResonate = async (noteId) => {
+    if (hasResonated) return;
+
+    try {
+      const noteRef = doc(db, "global_symphony", noteId);
+      await updateDoc(noteRef, {
+        resonanceCount: increment(1)
+      });
+      setHasResonated(true);
+
+      setSelectedNote(prev => ({ ...prev, resonanceCount: (prev.resonanceCount || 0) + 1 }));
+    } catch (error) {
+      console.error("Error sending resonance:", error);
     }
   };
 
@@ -371,6 +415,13 @@ function App() {
 
           <div className="hero">
             <div>
+              {/* THE ECHO NOTIFICATION */}
+              {myResonances > 0 && !sessionData && !showHistory && !showFavorites && !showStave && (
+                <div className="fade-in" style={{ background: '#89a37e', color: 'white', padding: '8px 16px', borderRadius: '20px', display: 'inline-block', marginBottom: '15px', fontSize: '0.85rem', fontWeight: 'bold', boxShadow: '0 4px 10px rgba(137,163,126,0.3)' }}>
+                  ✨ {myResonances} people resonated with notes you left behind.
+                </div>
+              )}
+
               <h1 style={{ cursor: 'pointer' }} onClick={() => { setShowHistory(false); setShowFavorites(false); setShowStave(false); setSessionData(null); setFilterMood(null); }}>Expressify</h1>
               <p className="description">Transform your words into emotional insights.</p>
 
@@ -445,8 +496,19 @@ function App() {
                   <small style={{ color: selectedNote.color, fontWeight: 'bold' }}>{selectedNote.mood}</small>
 
                   <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                    <button onClick={() => setSelectedNote(null)} className="history-toggle-btn" style={{ background: '#2d2d2d', color: 'white' }}>🤍 Resonate</button>
-                    <button onClick={() => setSelectedNote(null)} className="history-toggle-btn">Close</button>
+                    <button
+                      onClick={() => handleResonate(selectedNote.id)}
+                      className="history-toggle-btn"
+                      style={{ background: hasResonated ? '#89a37e' : '#2d2d2d', color: 'white', transition: 'all 0.3s' }}
+                      disabled={hasResonated}
+                    >
+                      {hasResonated ? '✨ Resonated' : '🤍 Resonate'}
+                      <span style={{ marginLeft: '6px', opacity: 0.7 }}>({selectedNote.resonanceCount || 0})</span>
+                    </button>
+
+                    <button onClick={() => { setSelectedNote(null); setHasResonated(false); }} className="history-toggle-btn">
+                      Close
+                    </button>
                   </div>
                 </div>
               )}
