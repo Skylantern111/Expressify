@@ -10,6 +10,7 @@ function App() {
   const [history, setHistory] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
+
   useEffect(() => {
     try {
       const savedH = JSON.parse(localStorage.getItem('vibe_history')) || [];
